@@ -1,17 +1,43 @@
+# **Calibration Curve Tool for Analytical Chemistry**
 
+This Python tool automates calibration curve generation, statistical analysis, and unknown sample calculations for analytical chemistry experiments. It simplifies the workflow by providing accurate and efficient calculations compared to manual methods or spreadsheets.
+
+---
+
+## **Features**
+
+1. **Statistical Analysis**:
+   - Calculates the mean, standard deviation, and 95% confidence interval for absorbance data.
+2. **Calibration Curve**:
+   - Generates a regression equation in the form \( y = mx + b \), along with the \( R^2 \) value.
+   - Plots the calibration curve with observed data points and the regression line.
+3. **Unknown Sample Calculations**:
+   - Determines the concentration of unknown samples based on their absorbance values.
+
+---
+
+## **How to Use**
+
+### **1. Download and Run Locally**
+
+#### Requirements:
+- Python 3.7 or later
+- Libraries:
+  ```bash
+  pip install numpy matplotlib scikit-learn scipy
 
 Calibration Curve Tool for Analytical Chemistry
 
 This Python tool automates calibration curve generation, statistical analysis, and unknown sample calculations for analytical chemistry experiments. It simplifies the workflow by providing accurate and efficient calculations compared to manual methods or spreadsheets.
 
 Features
-	1.	Statistical Analysis:
-	•	Calculates the mean, standard deviation, and 95% confidence interval for absorbance data.
-	2.	Calibration Curve:
-	•	Generates a regression equation in the form ￼, along with the ￼ value.
-	•	Plots the calibration curve with observed data points and the regression line.
-	3.	Unknown Sample Calculations:
-	•	Determines the concentration of unknown samples based on their absorbance values.
+Statistical Analysis:
+Calculates the mean, standard deviation, and 95% confidence interval for absorbance data.
+Calibration Curve:
+Generates a regression equation in the form ￼, along with the ￼ value.
+Plots the calibration curve with observed data points and the regression line.
+Unknown Sample Calculations:
+Determines the concentration of unknown samples based on their absorbance values.
 
 How to Use
 

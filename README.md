@@ -83,11 +83,12 @@ Screenshots
 
 1. Example Output
 
-Sample output showing regression equation and calculated concentration.
+<img width="399" alt="image" src="https://github.com/user-attachments/assets/3eae889e-cf50-4e2b-af9d-70a418a4cdb9" />
+<img width="440" alt="image" src="https://github.com/user-attachments/assets/604f34a3-1c5e-4671-9713-dd0cd73b15a8" />
 
 2. Example Graph
 
-A calibration curve with observed data points and a fitted regression line.
+<img width="776" alt="image" src="https://github.com/user-attachments/assets/02c38356-cb58-4514-b642-b2ab26614f82" />
 
 Contact
 

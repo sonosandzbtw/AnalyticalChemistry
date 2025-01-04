@@ -40,7 +40,7 @@ if st.button("Generate Calibration Curve"):
             ax.grid(True)
             st.pyplot(fig)
 
-  # Unknown sample concentration
+# Unknown sample concentration
 unknown_absorbance = st.number_input("Enter absorbance of the unknown sample:", min_value=0.0, step=0.01)
 
 if unknown_absorbance > 0:

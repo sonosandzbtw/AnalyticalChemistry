@@ -3,16 +3,20 @@ import numpy as np
 import matplotlib.pyplot as plt
 from sklearn.linear_model import LinearRegression
 
+# Initialize session state variables
+if "slope" not in st.session_state:
+    st.session_state.slope = None
+if "intercept" not in st.session_state:
+    st.session_state.intercept = None
+if "calibration_done" not in st.session_state:
+    st.session_state.calibration_done = False
+
 st.title("Extended Calibration Curve Tool")
 st.write("This tool generates calibration curves, calculates unknown concentrations, and performs basic statistical analysis.")
 
 # Input concentrations and absorbances
 concentration_input = st.text_input("Enter known concentrations (comma-separated):", "0.1, 0.2, 0.3, 0.4, 0.5")
 absorbance_input = st.text_input("Enter corresponding absorbance values (comma-separated):", "0.05, 0.1, 0.15, 0.21, 0.25")
-
-# Initialize slope and intercept to None
-slope = None
-intercept = None
 
 if st.button("Generate Calibration Curve"):
     try:
@@ -26,12 +30,13 @@ if st.button("Generate Calibration Curve"):
             # Perform linear regression
             model = LinearRegression()
             model.fit(concentrations.reshape(-1, 1), absorbances)
-            slope = model.coef_[0]
-            intercept = model.intercept_
+            st.session_state.slope = model.coef_[0]
+            st.session_state.intercept = model.intercept_
             r_squared = model.score(concentrations.reshape(-1, 1), absorbances)
+            st.session_state.calibration_done = True
 
             # Display results
-            st.success(f"**Calibration Curve Equation**: y = {slope:.4f}x + {intercept:.4f}")
+            st.success(f"**Calibration Curve Equation**: y = {st.session_state.slope:.4f}x + {st.session_state.intercept:.4f}")
             st.success(f"**R² Value**: {r_squared:.4f}")
 
             # Plot calibration curve
@@ -46,8 +51,8 @@ if st.button("Generate Calibration Curve"):
     except ValueError as e:
         st.error(f"Error: {e}. Please ensure all input values are numbers.")
 
-# Prompt to calculate unknown concentration if the calibration curve is generated
-if slope is not None and intercept is not None:
+# Calculate unknown sample concentration only if calibration is done
+if st.session_state.calibration_done:
     calculate_unknown = st.checkbox("Do you want to calculate the concentration of an unknown sample?")
 
     if calculate_unknown:
@@ -59,12 +64,12 @@ if slope is not None and intercept is not None:
 
         if unknown_absorbance > 0:
             try:
-                if slope == 0:
+                if st.session_state.slope == 0:
                     st.error(
                         "Error: Cannot calculate concentration because the slope is zero (no valid calibration curve)."
                     )
                 else:
-                    unknown_concentration = (unknown_absorbance - intercept) / slope
+                    unknown_concentration = (unknown_absorbance - st.session_state.intercept) / st.session_state.slope
                     st.success(
                         f"**Calculated Concentration for Unknown Sample**: {unknown_concentration:.4f} M"
                     )
@@ -72,3 +77,5 @@ if slope is not None and intercept is not None:
                 st.error("Error: Division by zero occurred during the calculation.")
             except Exception as e:
                 st.error(f"An unexpected error occurred: {e}")
+else:
+    st.warning("Please generate the calibration curve first before entering an unknown absorbance.")

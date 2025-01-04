@@ -19,6 +19,16 @@ if tool == "Calibration Curve Tool":
     concentration_input = st.text_input("Enter known concentrations (comma-separated):", "0.1, 0.2, 0.3, 0.4, 0.5")
     absorbance_input = st.text_input("Enter corresponding absorbance values (comma-separated):", "0.05, 0.1, 0.15, 0.21, 0.25")
     
+    # Define cache to store the calibration curve results
+    @st.cache_data
+    def compute_calibration_curve(concentrations, absorbances):
+        model = LinearRegression()
+        model.fit(concentrations.reshape(-1, 1), absorbances)
+        slope = model.coef_[0]
+        intercept = model.intercept_
+        r_squared = model.score(concentrations.reshape(-1, 1), absorbances)
+        return slope, intercept, r_squared, model
+
     if st.button("Generate Calibration Curve"):
         try:
             # Parse input data
@@ -28,12 +38,8 @@ if tool == "Calibration Curve Tool":
             if len(concentrations) != len(absorbances):
                 st.error("Error: The number of concentrations and absorbances must match.")
             else:
-                # Perform linear regression
-                model = LinearRegression()
-                model.fit(concentrations.reshape(-1, 1), absorbances)
-                slope = model.coef_[0]
-                intercept = model.intercept_
-                r_squared = model.score(concentrations.reshape(-1, 1), absorbances)
+                # Compute and cache the calibration curve
+                slope, intercept, r_squared, model = compute_calibration_curve(concentrations, absorbances)
 
                 # Display results
                 st.success(f"**Calibration Curve Equation**: y = {slope:.4f}x + {intercept:.4f}")
@@ -49,13 +55,20 @@ if tool == "Calibration Curve Tool":
                 ax.grid(True)
                 st.pyplot(fig)
 
-                # Unknown concentration calculation
-                unknown_absorbance = st.number_input("Enter absorbance of the unknown sample:", min_value=0.0, step=0.01)
-                if unknown_absorbance > 0:
-                    unknown_concentration = (unknown_absorbance - intercept) / slope
-                    st.success(f"**Calculated Concentration for Unknown Sample**: {unknown_concentration:.4f} M")
+                # Store slope and intercept in session state
+                st.session_state["slope"] = slope
+                st.session_state["intercept"] = intercept
         except Exception as e:
             st.error(f"An error occurred: {e}")
+
+    # Unknown concentration calculation
+    if "slope" in st.session_state and "intercept" in st.session_state:
+        unknown_absorbance = st.number_input("Enter absorbance of the unknown sample:", min_value=0.0, step=0.01)
+        if unknown_absorbance > 0:
+            slope = st.session_state["slope"]
+            intercept = st.session_state["intercept"]
+            unknown_concentration = (unknown_absorbance - intercept) / slope
+            st.success(f"**Calculated Concentration for Unknown Sample**: {unknown_concentration:.4f} M")
 
 # Titration Curve Generator
 if tool == "Titration Curve Generator":

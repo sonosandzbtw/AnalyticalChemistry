@@ -40,16 +40,24 @@ if st.button("Generate Calibration Curve"):
             ax.grid(True)
             st.pyplot(fig)
 
-# Unknown sample concentration
-unknown_absorbance = st.number_input("Enter absorbance of the unknown sample:", min_value=0.0, step=0.01)
+# Calculate unknown sample concentration
+unknown_absorbance = st.number_input(
+    "Enter absorbance of the unknown sample:",
+    min_value=0.0,
+    step=0.01,
+)
 
 if unknown_absorbance > 0:
     try:
         if slope == 0:
-            st.error("Error: Cannot calculate concentration because the slope is zero (no valid calibration curve).")
+            st.error(
+                "Error: Cannot calculate concentration because the slope is zero (no valid calibration curve)."
+            )
         else:
             unknown_concentration = (unknown_absorbance - intercept) / slope
-            st.success(f"**Calculated Concentration for Unknown Sample**: {unknown_concentration:.4f} M")
+            st.success(
+                f"**Calculated Concentration for Unknown Sample**: {unknown_concentration:.4f} M"
+            )
     except ZeroDivisionError:
         st.error("Error: Division by zero occurred during the calculation.")
     except Exception as e:

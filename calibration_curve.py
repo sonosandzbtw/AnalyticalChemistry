@@ -11,8 +11,8 @@ if "intercept" not in st.session_state:
 if "calibration_done" not in st.session_state:
     st.session_state.calibration_done = False
 
-st.title("Analytical Chemistry Calibration Tool")
-st.write("This tool helps you generate calibration curves and calculate unknown concentrations with ease.")
+st.title("Calibration Curve Tool")
+st.write("This tool generates calibration curves, calculates unknown concentrations, and performs basic statistical analysis.")
 
 # Input concentrations and absorbances
 concentration_input = st.text_input("Enter known concentrations (comma-separated):", "0.1, 0.2, 0.3, 0.4, 0.5")
@@ -51,16 +51,11 @@ if st.button("Generate Calibration Curve"):
     except ValueError as e:
         st.error(f"Error: {e}. Please ensure all input values are numbers.")
 
-# Ask if user wants to calculate unknown concentration
+# Calculate unknown sample concentration only if calibration is done
 if st.session_state.calibration_done:
-    st.write("Do you want to calculate the concentration of an unknown sample?")
-    col1, col2 = st.columns(2)
-    with col1:
-        yes = st.button("Yes")
-    with col2:
-        no = st.button("No")
+    calculate_unknown = st.checkbox("Do you want to calculate the concentration of an unknown sample?")
 
-    if yes:
+    if calculate_unknown:
         unknown_absorbance = st.number_input(
             "Enter absorbance of the unknown sample:",
             min_value=0.0,
@@ -82,10 +77,5 @@ if st.session_state.calibration_done:
                 st.error("Error: Division by zero occurred during the calculation.")
             except Exception as e:
                 st.error(f"An unexpected error occurred: {e}")
-
-    if no:
-        # Reset session state and go back to the beginning
-        st.session_state.slope = None
-        st.session_state.intercept = None
-        st.session_state.calibration_done = False
-        st.experimental_rerun()
+else:
+    st.warning("Please generate the calibration curve first before entering an unknown absorbance.")

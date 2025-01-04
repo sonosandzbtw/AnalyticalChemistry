@@ -24,9 +24,8 @@ if "calibration_done" not in st.session_state:
 # Center the title and description
 st.markdown(
     """
-    <div style="text-align: center;">
-        <h1>Analytical Chemistry Calibration Tool</h1>
-        <p>This tool generates calibration curves, performs statistical analysis, and calculates unknown concentrations.</p>
+    <div style="text-align: center; padding-top: 20px; padding-bottom: 20px;">
+        <h1>Analytical Chemistry<br>Calibration Tool</h1>
     </div>
     """,
     unsafe_allow_html=True,

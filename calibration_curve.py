@@ -10,6 +10,10 @@ st.write("This tool generates calibration curves, calculates unknown concentrati
 concentration_input = st.text_input("Enter known concentrations (comma-separated):", "0.1, 0.2, 0.3, 0.4, 0.5")
 absorbance_input = st.text_input("Enter corresponding absorbance values (comma-separated):", "0.05, 0.1, 0.15, 0.21, 0.25")
 
+# Initialize slope and intercept to None so they can be used later
+slope = None
+intercept = None
+
 if st.button("Generate Calibration Curve"):
     try:
         # Parse input data
@@ -39,26 +43,31 @@ if st.button("Generate Calibration Curve"):
             ax.legend()
             ax.grid(True)
             st.pyplot(fig)
+    except ValueError as e:
+        st.error(f"Error: {e}. Please ensure all input values are numbers.")
 
 # Calculate unknown sample concentration
-unknown_absorbance = st.number_input(
-    "Enter absorbance of the unknown sample:",
-    min_value=0.0,
-    step=0.01,
-)
+if slope is not None and intercept is not None:
+    unknown_absorbance = st.number_input(
+        "Enter absorbance of the unknown sample:",
+        min_value=0.0,
+        step=0.01,
+    )
 
-if unknown_absorbance > 0:
-    try:
-        if slope == 0:
-            st.error(
-                "Error: Cannot calculate concentration because the slope is zero (no valid calibration curve)."
-            )
-        else:
-            unknown_concentration = (unknown_absorbance - intercept) / slope
-            st.success(
-                f"**Calculated Concentration for Unknown Sample**: {unknown_concentration:.4f} M"
-            )
-    except ZeroDivisionError:
-        st.error("Error: Division by zero occurred during the calculation.")
-    except Exception as e:
-        st.error(f"An unexpected error occurred: {e}")
+    if unknown_absorbance > 0:
+        try:
+            if slope == 0:
+                st.error(
+                    "Error: Cannot calculate concentration because the slope is zero (no valid calibration curve)."
+                )
+            else:
+                unknown_concentration = (unknown_absorbance - intercept) / slope
+                st.success(
+                    f"**Calculated Concentration for Unknown Sample**: {unknown_concentration:.4f} M"
+                )
+        except ZeroDivisionError:
+            st.error("Error: Division by zero occurred during the calculation.")
+        except Exception as e:
+            st.error(f"An unexpected error occurred: {e}")
+else:
+    st.warning("Please generate the calibration curve first before entering an unknown absorbance.")

@@ -21,8 +21,16 @@ if "intercept" not in st.session_state:
 if "calibration_done" not in st.session_state:
     st.session_state.calibration_done = False
 
-st.title("Analytical Chemistry Calibration Tool")
-st.write("This tool generates calibration curves, performs statistical analysis, and calculates unknown concentrations.")
+# Center the title and description
+st.markdown(
+    """
+    <div style="text-align: center;">
+        <h1>Analytical Chemistry Calibration Tool</h1>
+        <p>This tool generates calibration curves, performs statistical analysis, and calculates unknown concentrations.</p>
+    </div>
+    """,
+    unsafe_allow_html=True,
+)
 
 # Input concentrations and absorbances
 concentration_input = st.text_input("Enter known concentrations (comma-separated):", "0.1, 0.2, 0.3, 0.4, 0.5")

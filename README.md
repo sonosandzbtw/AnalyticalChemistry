@@ -100,13 +100,6 @@ The tool will output the following:
 
 
 
-Folder Structure
-
-calibration_curve_tool/
-│
-├── calibration_curve.py    # The main Python script
-├── README.md               # Documentation for the project
-
 
 
 Screenshots

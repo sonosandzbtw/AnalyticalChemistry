@@ -1,57 +1,48 @@
-import numpy as np
-import plotly.graph_objects as go
 import streamlit as st
+import plotly.graph_objects as go
+import pandas as pd
 
-# Function to calculate pH
-def calculate_pH(volume_base, acid_conc, base_conc, volume_acid):
-    moles_acid = acid_conc * volume_acid / 1000  # Initial moles of acid
-    moles_base = base_conc * volume_base / 1000  # Moles of base added
-    
-    if moles_base < moles_acid:  # Before equivalence point
-        moles_H3O = moles_acid - moles_base
-        pH = -np.log10(moles_H3O / (volume_acid + volume_base) * 1000)
-    elif moles_base == moles_acid:  # At equivalence point
-        pH = 7  # Neutral for strong acid and strong base
-    else:  # After equivalence point
-        moles_OH = moles_base - moles_acid
-        pOH = -np.log10(moles_OH / (volume_acid + volume_base) * 1000)
-        pH = 14 - pOH
-        
-    return pH
-
-# Streamlit App
+# Title
 st.title("Interactive Titration Curve")
 
-# Input fields
-acid_concentration = st.slider("Acid Concentration (M)", 0.01, 1.0, 0.1, 0.01)
-base_concentration = st.slider("Base Concentration (M)", 0.01, 1.0, 0.1, 0.01)
-volume_acid = st.slider("Acid Volume (mL)", 10.0, 100.0, 50.0, 1.0)
+# Data Input Section
+st.header("Enter Titration Data")
+st.write("Input your titration data below (Volume and pH):")
 
-# Calculate titration curve
-volume_base_added = np.linspace(0, 2 * volume_acid, 500)
-pH_values = [calculate_pH(vb, acid_concentration, base_concentration, volume_acid) for vb in volume_base_added]
+# Create columns for data entry
+data = st.text_area("Paste your data in two columns (Volume NaOH, pH), separated by commas.\nExample:\n0.000,3.58\n1.250,3.62", height=200)
 
-# Create plot
-fig = go.Figure()
-fig.add_trace(go.Scatter(
-    x=volume_base_added,
-    y=pH_values,
-    mode='lines',
-    name='Titration Curve'
-))
-equivalence_point = volume_acid * acid_concentration / base_concentration
-fig.add_trace(go.Scatter(
-    x=[equivalence_point, equivalence_point],
-    y=[0, 14],
-    mode='lines',
-    name='Equivalence Point',
-    line=dict(dash='dash', color='red')
-))
-fig.update_layout(
-    title="Titration Curve",
-    xaxis_title="Volume of Base Added (mL)",
-    yaxis_title="pH",
-    template="plotly_white"
-)
-
-st.plotly_chart(fig)
+# Parse the data into a DataFrame
+if data:
+    try:
+        # Split data into rows and columns
+        data_rows = [line.split(",") for line in data.split("\n") if line.strip()]
+        df = pd.DataFrame(data_rows, columns=["Volume (mL)", "pH"], dtype=float)
+        
+        # Display the table
+        st.write("Your Titration Data:")
+        st.write(df)
+        
+        # Generate Plot
+        st.header("Titration Curve")
+        fig = go.Figure()
+        fig.add_trace(go.Scatter(
+            x=df["Volume (mL)"],
+            y=df["pH"],
+            mode='markers+lines',
+            name='Titration Curve'
+        ))
+        
+        fig.update_layout(
+            title="Titration Curve (Custom Data)",
+            xaxis_title="Volume of NaOH Added (mL)",
+            yaxis_title="pH",
+            template="plotly_white"
+        )
+        
+        st.plotly_chart(fig)
+        
+    except Exception as e:
+        st.error(f"Error processing data: {e}")
+else:
+    st.write("Waiting for data input...")

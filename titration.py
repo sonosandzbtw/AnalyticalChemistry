@@ -5,12 +5,12 @@ import plotly.graph_objects as go
 from scipy.stats import linregress
 
 # Title
-st.title("Interactive Titration Curve with Explanations")
+st.title("Titration Curve for Analytical Chemistry")
 
 # Default data for the table
 default_data = {
-    "Volume NaOH (mL)": [0.000, 1.250, 2.000, 3.250, 4.900, 6.000, 8.000, 9.000],
-    "pH": [3.58, 3.62, 3.72, 4.35, 4.60, 4.80, 5.21, 5.61],
+    "Volume NaOH (mL)": [0.000, 1.250, 2.000, 3.250],
+    "pH": [3.58, 3.62, 3.72, 4.35]
 }
 df = pd.DataFrame(default_data)
 
@@ -20,14 +20,25 @@ gb = GridOptionsBuilder.from_dataframe(df)
 gb.configure_default_column(editable=True)
 grid_options = gb.build()
 
+# Show editable table
 grid_response = AgGrid(
     df,
     gridOptions=grid_options,
     update_mode="value_changed",
     fit_columns_on_grid_load=True,
 )
-
 df = pd.DataFrame(grid_response["data"])
+
+# Add a new column dynamically
+st.subheader("Add a New Column")
+column_name = st.text_input("Enter new column name", key="column_name")
+if st.button("Add New Column"):
+    if column_name and column_name not in df.columns:
+        df[column_name] = [0] * len(df)  # Add new column with default value 0
+        st.success(f"Column '{column_name}' added!")
+        st.experimental_rerun()  # Refresh the table to reflect the new column
+    else:
+        st.error("Column name cannot be empty or already exist!")
 
 # Plotting Titration Curve
 st.subheader("Titration Curve")

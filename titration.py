@@ -4,7 +4,7 @@ import plotly.graph_objects as go
 from scipy.stats import linregress
 
 # Title
-st.title("Titration Curve with Scenarios")
+st.title("Interactive Titration Curve with Detailed Explanations")
 
 # Scenario Selection
 st.sidebar.header("Titration Settings")
@@ -23,7 +23,6 @@ data = st.text_area(
     height=200,
 )
 
-# Parse the data into a DataFrame
 if data:
     try:
         # Split data into rows and columns
@@ -67,7 +66,7 @@ if data:
 
             st.write(f"**Equivalence Point:** {equivalence_point:.3f} mL NaOH added, pH = {equivalence_pH:.2f}")
 
-            # Additional Calculations for Weak Acids/Bases
+            # Half-Equivalence Point (for weak acids/bases)
             if titration_type in ["Weak Acid - Strong Base", "Weak Base - Strong Acid"]:
                 half_eq_index = equivalence_index // 2
                 half_eq_volume = df["Volume NaOH (mL)"].iloc[half_eq_index]
@@ -78,13 +77,34 @@ if data:
         else:
             st.write("Not enough data points to calculate equivalence point.")
 
-        # Adjusting Curve Details Based on Titration Type
-        if titration_type == "Strong Acid - Strong Base":
-            st.write("**Note:** The equivalence point for strong acid-strong base titrations is at pH 7.")
-        elif titration_type == "Weak Acid - Strong Base":
-            st.write("**Note:** The equivalence point for weak acid-strong base titrations occurs at pH > 7 due to the formation of a basic conjugate.")
-        elif titration_type == "Weak Base - Strong Acid":
-            st.write("**Note:** The equivalence point for weak base-strong acid titrations occurs at pH < 7 due to the formation of an acidic conjugate.")
+        # Detailed Explanations
+        st.subheader("Detailed Explanations")
+        st.markdown(f"""
+        ### Key Features of Your Titration Curve:
+        1. **Buffer Region**:
+            - For **{titration_type}**, the buffer region occurs before the equivalence point.
+            - The buffer region is characterized by a gradual change in pH due to the presence of the weak acid and its conjugate base (or vice versa).
+            - Example: For weak acid-strong base, the weak acid (HA) reacts with NaOH to form its conjugate base (A⁻), which helps resist pH changes.
+
+        2. **Half-Equivalence Point** (if applicable):
+            - The half-equivalence point occurs when half of the weak acid (or weak base) has been neutralized.
+            - At this point, the concentrations of the weak acid and its conjugate base are equal.
+            - **pH = pKa** (for weak acid-strong base) or **pH = pKb** (for weak base-strong acid).
+
+        3. **Equivalence Point**:
+            - The equivalence point occurs when the moles of acid and base are stoichiometrically equal.
+            - For **{titration_type}**, the equivalence point is expected at:
+                - **pH = 7** for strong acid-strong base titration.
+                - **pH > 7** for weak acid-strong base titration (due to the basic nature of the conjugate base).
+                - **pH < 7** for weak base-strong acid titration (due to the acidic nature of the conjugate acid).
+
+        4. **Post-Equivalence Point**:
+            - Beyond the equivalence point, the pH is dominated by the excess strong acid or strong base added.
+            - The curve levels off as the solution becomes saturated with the strong acid/base.
+
+        ### Your Observations:
+        - Equivalence Point: At {equivalence_point:.3f} mL, pH = {equivalence_pH:.2f}.
+        """)
 
         fig.update_layout(
             title=f"Titration Curve: {titration_type}",
@@ -107,13 +127,6 @@ if data:
         else:
             st.write("Add more data points to see statistical summaries.")
 
-        # Academic Explanation
-        st.markdown("""
-        ### Key Concepts
-        - **Equivalence Point**: The point at which moles of acid and base are stoichiometrically equal.
-        - **Half-equivalence Point**: For weak acids/bases, the point where pH = pKa or pH = pKb.
-        - **Buffer Region**: A region where the solution resists changes in pH (weak acids/bases).
-        """)
     except Exception as e:
         st.error(f"Error processing data: {e}")
 else:

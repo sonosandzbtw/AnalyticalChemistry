@@ -4,7 +4,7 @@ import plotly.graph_objects as go
 from scipy.stats import linregress
 
 # Title
-st.title("Versatile Titration Curve with Scenarios")
+st.title("Titration Curve with Scenarios")
 
 # Scenario Selection
 st.sidebar.header("Titration Settings")

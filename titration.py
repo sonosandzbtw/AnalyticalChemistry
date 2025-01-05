@@ -4,7 +4,14 @@ import plotly.graph_objects as go
 from scipy.stats import linregress
 
 # Title
-st.title("Titration Curve Generator")
+st.title("Versatile Titration Curve with Scenarios")
+
+# Scenario Selection
+st.sidebar.header("Titration Settings")
+titration_type = st.sidebar.selectbox(
+    "Select the titration type:",
+    ["Strong Acid - Strong Base", "Weak Acid - Strong Base", "Weak Base - Strong Acid"]
+)
 
 # Data Input Section
 st.subheader("Enter Your Titration Data")
@@ -37,7 +44,7 @@ if data:
             name='Titration Curve'
         ))
 
-        # Find Equivalence Point (approximation)
+        # Equivalence Point Calculation
         if len(df) > 1:
             max_slope = max(
                 abs((df["pH"].iloc[i+1] - df["pH"].iloc[i]) / (df["Volume NaOH (mL)"].iloc[i+1] - df["Volume NaOH (mL)"].iloc[i]))
@@ -48,28 +55,46 @@ if data:
                 if abs((df["pH"].iloc[i+1] - df["pH"].iloc[i]) / (df["Volume NaOH (mL)"].iloc[i+1] - df["Volume NaOH (mL)"].iloc[i])) == max_slope
             ][0]
             equivalence_point = df["Volume NaOH (mL)"].iloc[equivalence_index]
+            equivalence_pH = df["pH"].iloc[equivalence_index]
 
             fig.add_trace(go.Scatter(
                 x=[equivalence_point],
-                y=[df["pH"].iloc[equivalence_index]],
+                y=[equivalence_pH],
                 mode='markers',
                 marker=dict(color='red', size=10),
                 name='Equivalence Point'
             ))
 
-            st.write(f"**Equivalence Point Approximation:** {equivalence_point:.3f} mL NaOH added")
+            st.write(f"**Equivalence Point:** {equivalence_point:.3f} mL NaOH added, pH = {equivalence_pH:.2f}")
+
+            # Additional Calculations for Weak Acids/Bases
+            if titration_type in ["Weak Acid - Strong Base", "Weak Base - Strong Acid"]:
+                half_eq_index = equivalence_index // 2
+                half_eq_volume = df["Volume NaOH (mL)"].iloc[half_eq_index]
+                half_eq_pH = df["pH"].iloc[half_eq_index]
+                st.write(f"**Half-equivalence Point:** {half_eq_volume:.3f} mL NaOH, pH = {half_eq_pH:.2f}")
+                st.write(f"**pKa (or pKb):** {half_eq_pH:.2f}")
+
         else:
             st.write("Not enough data points to calculate equivalence point.")
 
+        # Adjusting Curve Details Based on Titration Type
+        if titration_type == "Strong Acid - Strong Base":
+            st.write("**Note:** The equivalence point for strong acid-strong base titrations is at pH 7.")
+        elif titration_type == "Weak Acid - Strong Base":
+            st.write("**Note:** The equivalence point for weak acid-strong base titrations occurs at pH > 7 due to the formation of a basic conjugate.")
+        elif titration_type == "Weak Base - Strong Acid":
+            st.write("**Note:** The equivalence point for weak base-strong acid titrations occurs at pH < 7 due to the formation of an acidic conjugate.")
+
         fig.update_layout(
-            title="Titration Curve",
+            title=f"Titration Curve: {titration_type}",
             xaxis_title="Volume of NaOH Added (mL)",
             yaxis_title="pH",
             template="plotly_white",
         )
         st.plotly_chart(fig)
 
-        # Data Summary and Linear Regression
+        # Data Summary
         st.subheader("Data Summary and Calculations")
         if len(df) > 2:
             st.write("Summary of your data:")
@@ -85,11 +110,9 @@ if data:
         # Academic Explanation
         st.markdown("""
         ### Key Concepts
-        - **Equivalence Point**: This is where the moles of acid and base are stoichiometrically equal.
-        - **Endpoint**: The observed point of neutralization. Ideally, this coincides with the equivalence point.
-        - **Buffer Region**: In weak acid/base titrations, this is the region where pH changes gradually due to buffering.
-        - **pKa**: For weak acids, the pKa can be approximated from the midpoint of the buffer region.
-        - **Max Slope**: In a strong acid-base titration, the equivalence point corresponds to the steepest slope on the titration curve.
+        - **Equivalence Point**: The point at which moles of acid and base are stoichiometrically equal.
+        - **Half-equivalence Point**: For weak acids/bases, the point where pH = pKa or pH = pKb.
+        - **Buffer Region**: A region where the solution resists changes in pH (weak acids/bases).
         """)
     except Exception as e:
         st.error(f"Error processing data: {e}")

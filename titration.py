@@ -4,7 +4,7 @@ import plotly.graph_objects as go
 from scipy.stats import linregress
 
 # Title
-st.title("Interactive Titration Curve with Detailed Explanations")
+st.title("Analytical Chemistry Titration Curve Study Tool")
 
 # Scenario Selection
 st.sidebar.header("Titration Settings")

@@ -4,7 +4,7 @@ import plotly.graph_objects as go
 from scipy.stats import linregress
 
 # Title
-st.title("Interactive Titration Curve with Explanations")
+st.title("Titration Curve Generator")
 
 # Data Input Section
 st.subheader("Enter Your Titration Data")

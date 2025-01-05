@@ -3,4 +3,5 @@ matplotlib
 scikit-learn
 scipy
 streamlit
+streamlit-aggrid
 plotly

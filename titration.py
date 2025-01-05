@@ -4,7 +4,7 @@ import plotly.graph_objects as go
 from scipy.stats import linregress
 
 # Title
-st.title("Analytical Chemistry Titration Curve Study Tool")
+st.title("Interactive Titration Curve with Detailed Explanations")
 
 # Scenario Selection
 st.sidebar.header("Titration Settings")
@@ -77,6 +77,27 @@ if data:
         else:
             st.write("Not enough data points to calculate equivalence point.")
 
+        fig.update_layout(
+            title=f"Titration Curve: {titration_type}",
+            xaxis_title="Volume of NaOH Added (mL)",
+            yaxis_title="pH",
+            template="plotly_white",
+        )
+        st.plotly_chart(fig)
+
+        # Data Summary
+        st.subheader("Data Summary and Calculations")
+        if len(df) > 2:
+            st.write("Summary of your data:")
+            st.write(df.describe())
+
+            # Perform linear regression on pH data
+            slope, intercept, r_value, p_value, std_err = linregress(df["Volume NaOH (mL)"], df["pH"])
+            st.write(f"Linear Regression p-value: {p_value:.5f}")
+            st.write(f"Regression R-squared: {r_value**2:.5f}")
+        else:
+            st.write("Add more data points to see statistical summaries.")
+
         # Detailed Explanations
         st.subheader("Detailed Explanations")
         st.markdown(f"""
@@ -105,28 +126,6 @@ if data:
         ### Your Observations:
         - Equivalence Point: At {equivalence_point:.3f} mL, pH = {equivalence_pH:.2f}.
         """)
-
-        fig.update_layout(
-            title=f"Titration Curve: {titration_type}",
-            xaxis_title="Volume of NaOH Added (mL)",
-            yaxis_title="pH",
-            template="plotly_white",
-        )
-        st.plotly_chart(fig)
-
-        # Data Summary
-        st.subheader("Data Summary and Calculations")
-        if len(df) > 2:
-            st.write("Summary of your data:")
-            st.write(df.describe())
-
-            # Perform linear regression on pH data
-            slope, intercept, r_value, p_value, std_err = linregress(df["Volume NaOH (mL)"], df["pH"])
-            st.write(f"Linear Regression p-value: {p_value:.5f}")
-            st.write(f"Regression R-squared: {r_value**2:.5f}")
-        else:
-            st.write("Add more data points to see statistical summaries.")
-
     except Exception as e:
         st.error(f"Error processing data: {e}")
 else:
